@@ -1,0 +1,60 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Interfaces/OnlineSessionInterface.h"
+#include "Blueprint/UserWidget.h"
+#include "Menu.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class MULTIPLAYERSESSIONS_API UMenu : public UUserWidget
+{
+	GENERATED_BODY()
+	
+public:
+	
+	UFUNCTION(BlueprintCallable)
+	void MenuSetup(int32 NumberOfConnections = 4, FString TypeOfMatch = TEXT("FreeForAll"));
+
+protected:
+
+	virtual bool Initialize() override;
+	virtual void NativeDestruct() override;
+
+	//
+	// Callbacks for the custom delegates on the MultiplayerSessionsSubsystem
+	UFUNCTION()
+	void OnCreateSession(bool bWasSuccessful);
+
+	void OnFindSession(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful);
+	void OnJoinSession(EOnJoinSessionCompleteResult::Type Result);
+	UFUNCTION()
+	void OnDestroySession(bool bWasSuccessful);
+	UFUNCTION()
+	void OnStartSession(bool bWasSuccessful);
+
+private:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Host_Btn;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Join_Btn;
+
+	UFUNCTION()
+	void HostBtnClicked();
+
+	UFUNCTION()
+	void JoinBtnClicked();
+
+	void MenuTearDown();
+
+	// The class for all multiplayer sessions functionality
+	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+
+	int32 NumPublicConnections{4};
+	FString MatchType{ TEXT("FreeForAll") };
+};
